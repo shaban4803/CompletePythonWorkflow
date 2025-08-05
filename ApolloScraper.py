@@ -63,3 +63,27 @@ def extract_contact_data_from_profile(linkedin_url):
     
     print(f"Found {len(emails)} emails and {len(phones)} phones")
     return emails, phones
+
+def process_all_linkedin_profiles():
+    from database import (
+        get_unprocessed_linkedin_profiles, 
+        save_email_to_database, 
+        save_phone_to_database, 
+        mark_profile_as_processed
+    )
+    
+    profiles = get_unprocessed_linkedin_profiles(limit=3)
+    
+    for people_id, linkedin_url in profiles:
+        print(f"\nProcessing Profile ID: {people_id}")
+        
+        emails, phones = extract_contact_data_from_profile(linkedin_url)
+        
+        for email in emails:
+            save_email_to_database(email, people_id)
+        
+        for phone in phones:
+            save_phone_to_database(phone, people_id)
+        
+        mark_profile_as_processed(people_id)
+        print(f"Completed Profile ID: {people_id}")
